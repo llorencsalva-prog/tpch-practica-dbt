@@ -1,0 +1,21 @@
+select
+    order_item_key,
+    order_key,
+    line_number,
+    customer_key,
+    part_key,
+    supplier_key,
+    to_number(to_char(order_date, 'YYYYMMDD'))  as order_date_key,
+    to_number(to_char(ship_date, 'YYYYMMDD'))   as ship_date_key,
+    order_status,
+    order_priority,
+    ship_mode,
+    return_flag,
+    quantity,
+    gross_amount,
+    round(gross_amount - net_amount, 2)         as discount_amount,
+    net_amount,
+    net_amount_with_tax,
+    days_to_ship,
+    is_late_delivery
+from {{ ref('int_order_items') }}

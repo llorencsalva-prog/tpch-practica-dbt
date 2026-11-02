@@ -1,0 +1,23 @@
+version: 2
+
+models:
+  - name: int_order_items
+    description: "Líneas de pedido enriquecidas con la cabecera, importes netos y KPIs de entrega."
+
+unit_tests:
+  - name: test_int_order_items_importes_y_estado
+    description: "Comprueba net_amount (macro), impuestos, decodificación de estado y retraso."
+    model: int_order_items
+    given:
+      - input: ref('stg_tpch__orders')
+        rows:
+          - {order_key: 1, customer_key: 10, order_status_code: 'F', order_date: '1995-01-01'}
+          - {order_key: 2, customer_key: 20, order_status_code: 'O', order_date: '1995-01-01'}
+      - input: ref('stg_tpch__lineitem')
+        rows:
+          - {order_key: 1, line_number: 1, extended_price: 100, discount_pct: 0.10, tax_pct: 0.05, ship_date: '1995-01-05', commit_date: '1995-01-10', receipt_date: '1995-01-12'}
+          - {order_key: 2, line_number: 1, extended_price: 200, discount_pct: 0, tax_pct: 0, ship_date: '1995-01-02', commit_date: '1995-01-10', receipt_date: '1995-01-08'}
+    expect:
+      rows:
+        - {order_key: 1, order_status: 'Fulfilled', net_amount: 90.00, net_amount_with_tax: 94.50, days_to_ship: 4, is_late_delivery: true}
+        - {order_key: 2, order_status: 'Open', net_amount: 200.00, net_amount_with_tax: 200.00, days_to_ship: 1, is_late_delivery: false}

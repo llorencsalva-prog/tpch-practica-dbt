@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: fct_sales
+    description: "Hechos de ventas. Granularidad: una fila por línea de pedido."
+    columns:
+      - name: order_item_key
+        data_tests: [unique, not_null]
+      - name: customer_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_key
+      - name: part_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_part')
+                field: part_key
+      - name: supplier_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_supplier')
+                field: supplier_key
+      - name: order_date_key
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key
+      - name: order_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Fulfilled', 'Open', 'Partial']
+
+  - name: dim_customer
+    description: "Clientes con país y región."
+    columns:
+      - name: customer_key
+        data_tests: [unique, not_null]
+
+  - name: dim_supplier
+    description: "Proveedores con país y región."
+    columns:
+      - name: supplier_key
+        data_tests: [unique, not_null]
+
+  - name: dim_part
+    description: "Catálogo de piezas."
+    columns:
+      - name: part_key
+        data_tests: [unique, not_null]
+
+  - name: dim_date
+    description: "Calendario 1992-1998."
+    columns:
+      - name: date_key
+        data_tests: [unique, not_null]

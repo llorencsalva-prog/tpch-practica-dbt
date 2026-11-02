@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: stg_tpch__orders
+    description: "Pedidos. Carga INCREMENTAL (merge por order_key, filtrando por order_date)."
+    columns:
+      - name: order_key
+        data_tests: [unique, not_null]
+      - name: order_status_code
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['F', 'O', 'P']
+
+  - name: stg_tpch__lineitem
+    description: "Líneas de pedido. Granularidad: pedido + número de línea."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['order_key', 'line_number']
+
+  - name: stg_tpch__customer
+    columns:
+      - name: customer_key
+        data_tests: [unique, not_null]
+
+  - name: stg_tpch__part
+    columns:
+      - name: part_key
+        data_tests: [unique, not_null]
+
+  - name: stg_tpch__supplier
+    columns:
+      - name: supplier_key
+        data_tests: [unique, not_null]
+
+  - name: stg_tpch__partsupp
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['part_key', 'supplier_key']
+
+  - name: stg_tpch__nation
+    columns:
+      - name: nation_key
+        data_tests: [unique, not_null]
+
+  - name: stg_tpch__region
+    columns:
+      - name: region_key
+        data_tests: [unique, not_null]
